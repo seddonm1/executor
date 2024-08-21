@@ -1,0 +1,28 @@
+[package]
+name = "workflow"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+full = ["http"]
+http = ["dep:http"]
+
+[dependencies]
+bytes = "1.7.1"
+log = "0.4.22"
+http = { version = "1.1.0", optional = true }
+serde = { version = "1.0.209", features = ["derive"] }
+serde_json = "1.0.127"
+uuid = "1.10.0"
+wit-bindgen-rt = { version = "0.30.0", features = ["bitflags"] }
+workflow-macros = { path = "../workflow-macros" }
+
+[build-dependencies]
+wit-bindgen = "0.30.0"
+
+[package.metadata.component]
+package = "component:workflow"
+
+[package.metadata.component.bindings]
+pub_export_macro = true

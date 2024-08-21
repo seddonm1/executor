@@ -1,0 +1,112 @@
+package component:workflow;
+
+interface abi {
+    use http.{request, response, error};
+
+    variant guest-to-host {
+        input,
+        random(types),
+        time,
+        http-request(request),
+        log(level)
+    }
+
+    record host-to-guest {
+        id: string,
+        content: content
+    }
+
+    variant content {
+        unit,
+        random(types),
+        value(types),
+        http-response(result<response, error>),
+        time(system-time)
+    }
+
+    variant types {
+        bool-type(bool),
+        i32-type(u32),
+        f32-type(f32),
+        string-type(string),
+    }
+
+    variant level {
+        trace(string),
+        debug(string),
+        info(string),
+        warn(string),
+        error(string)
+    }
+
+    record system-time {
+        tv-sec: u64,
+        tv-nsec: u32
+    }
+
+    record workflow-error {
+        id: option<string>,
+        error: string
+    }
+}
+
+interface http {
+    record request {
+        method: method,
+        body: option<list<u8>>,
+        path: string,
+        headers: list<header>
+    }
+
+    record response {
+        status: u16,
+        http-version: version,
+        headers: list<header>,
+        content-length: option<u64>,
+        url: string,
+        body: list<u8>,
+    }
+
+    enum method {
+        get,
+        post,
+        delete
+    }
+
+    record header {
+        key: string,
+        value: string
+    }
+
+    variant version {
+        http-zero-nine,
+        http-one-zero,
+        http-one-one,
+        http-two-zero,
+        http-three-zero
+    }
+
+    record error {
+        url: option<string>,
+        kind: option<kind>
+    }
+
+    variant kind {
+        builder,
+        request,
+        redirect,
+        status(u16),
+        body,
+        decode,
+        upgrade
+    }
+}
+
+world workflow {
+    use abi.{guest-to-host, host-to-guest, workflow-error};
+    export abi;
+    export http;
+
+    import call: func(input: guest-to-host) -> host-to-guest;
+    export execute: func() -> result<_, workflow-error>;
+}
