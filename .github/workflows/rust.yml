@@ -39,7 +39,7 @@ jobs:
         run: |
           cargo install cargo-component --locked
           rustup target add wasm32-unknown-unknown
-          cargo component build --release --package workflow --target wasm32-unknown-unknown
+          cargo component build --release --package workflow-example --target wasm32-unknown-unknown
       - name: Run tests
         run: |
           cargo test
